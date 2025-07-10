@@ -1,6 +1,7 @@
 package tracker;
 
 import tracker.managers.Managers;
+import tracker.managers.historymanager.InMemoryHistoryManager;
 import tracker.managers.taskmanager.TaskManager;
 import tracker.model.Epic;
 import tracker.model.Subtask;
@@ -25,6 +26,7 @@ public class Main {
         taskManager.addSubtask(advertisement);
         taskManager.addSubtask(service);
 
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
         taskManager.getTask(dinner.getId());
         dinner.setId(4125748);
         taskManager.getEpic(repair.getId());
@@ -37,6 +39,5 @@ public class Main {
         for (Integer sI : epicCopy.getSubtaskIds()) {
             System.out.println(taskManager.getSubtask(sI));
         }
-
     }
 }

@@ -25,16 +25,17 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void linkLast_addTheNodeToTheEndOfTheList() {
+    public void add_addTheTaskToTheEndOfTheList() {
         InMemoryHistoryManager history = new InMemoryHistoryManager();
         Task task = new Task("Name 1", "Task");
         task.setId(427);
+        history.add(task);
+
         Epic epic = new Epic("Name 2", "Epic");
         epic.setId(538);
-        history.add(task);
         history.add(epic);
 
-        Assertions.assertEquals(epic, history.getTail());
+        Assertions.assertEquals(epic, history.getLast());
     }
 
     @Test

@@ -15,24 +15,23 @@ import java.util.List;
 public class InMemoryTaskManager implements TaskManager {
     private int idSequence = 0;
     private HistoryManager historyManager;
+    private HashMap<Integer, Task> tasks = new HashMap<>();
+    private HashMap<Integer, Epic> epics = new HashMap<>();
+    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
     public InMemoryTaskManager() {
         this.historyManager = Managers.getDefaultHistory();
     }
 
+
     private int generateId() {
         return ++idSequence;
     }
-
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
-
 
     // TASK METHODS
     @Override
