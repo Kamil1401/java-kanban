@@ -1,8 +1,6 @@
 package tracker.managers.taskmanager;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import tracker.model.Task;
 
 import java.io.*;
@@ -10,10 +8,11 @@ import java.nio.file.Files;
 
 class FileBackedTaskManagerTest {
     FileBackedTaskManager manager;
-    File file = new File("C:\\Users\\User\\IdeaProjects\\Final_Work_6\\java-kanban", "Test.csv");
+    File file;
 
     @BeforeEach
-    public void beforeEach() {
+    public void beforeEach() throws IOException {
+        file = Files.createTempFile("Test", ".csv").toFile();
         manager = new FileBackedTaskManager(file);
     }
 
@@ -44,6 +43,11 @@ class FileBackedTaskManagerTest {
 
         Assertions.assertNotNull(taskManager.getTask(task.getId()));
         Assertions.assertEquals(task, taskManager.getTask(task.getId()));
+    }
+
+    @AfterEach
+    public void afterEach() {
+        file.delete();
     }
 
 }
