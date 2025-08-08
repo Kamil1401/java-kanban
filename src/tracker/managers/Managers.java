@@ -9,7 +9,7 @@ import java.io.File;
 
 public class Managers {
      static File file = new File("C:\\Users\\User\\IdeaProjects\\Final_Work_6\\java-kanban",
-             "Manager.txt");
+             "Manager.csv");
 
     public static TaskManager getDefault() {
         return new FileBackedTaskManager(file);
