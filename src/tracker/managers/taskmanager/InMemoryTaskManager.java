@@ -13,11 +13,11 @@ import java.util.List;
 
 
 public class InMemoryTaskManager implements TaskManager {
-    private int idSequence = 0;
-    private HistoryManager historyManager;
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    protected int idSequence = 0;
+    protected HistoryManager historyManager;
+    protected HashMap<Integer, Task> tasks = new HashMap<>();
+    protected HashMap<Integer, Epic> epics = new HashMap<>();
+    protected HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
     public InMemoryTaskManager() {
         this.historyManager = Managers.getDefaultHistory();
@@ -179,7 +179,7 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
         subtasks.remove(id);
-        subtask.clearId();
+        subtask.deleteId();
         updateEpicStatus(epicOfSubtask);
     }
 

@@ -1,7 +1,7 @@
 package tracker;
 
 import tracker.managers.Managers;
-import tracker.managers.historymanager.InMemoryHistoryManager;
+import tracker.managers.taskmanager.FileBackedTaskManager;
 import tracker.managers.taskmanager.TaskManager;
 import tracker.model.Epic;
 import tracker.model.Subtask;
@@ -25,19 +25,5 @@ public class Main {
         Subtask service = new Subtask("Сервис", "Отвезти машину в сервис", sale.getId());
         taskManager.addSubtask(advertisement);
         taskManager.addSubtask(service);
-
-        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
-        taskManager.getTask(dinner.getId());
-        dinner.setId(4125748);
-        taskManager.getEpic(repair.getId());
-        repair.setId(94715);
-        taskManager.getSubtask(hiring.getId());
-        hiring.setId(64758);
-        System.out.println(taskManager.getHistory());
-
-        Epic epicCopy = sale.copy();
-        for (Integer sI : epicCopy.getSubtaskIds()) {
-            System.out.println(taskManager.getSubtask(sI));
-        }
     }
 }
