@@ -13,7 +13,12 @@ class FileBackedTaskManagerTest {
     @BeforeEach
     public void beforeEach() throws IOException {
         file = Files.createTempFile("Test", ".csv").toFile();
-        manager = new FileBackedTaskManager(file);
+        manager = FileBackedTaskManager.getNewFailBackedTaskManager(file);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        file.delete();
     }
 
     @Test
@@ -44,10 +49,4 @@ class FileBackedTaskManagerTest {
         Assertions.assertNotNull(taskManager.getTask(task.getId()));
         Assertions.assertEquals(task, taskManager.getTask(task.getId()));
     }
-
-    @AfterEach
-    public void afterEach() {
-        file.delete();
-    }
-
 }

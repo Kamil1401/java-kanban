@@ -9,10 +9,10 @@ import java.io.File;
 
 public class Managers {
      static File file = new File("C:\\Users\\User\\IdeaProjects\\Final_Work_6\\java-kanban",
-             "Manager.csv");
+             "Work.csv");
 
     public static TaskManager getDefault() {
-        return new FileBackedTaskManager(file);
+        return FileBackedTaskManager.getNewFailBackedTaskManager(file);
     }
 
     public static HistoryManager getDefaultHistory() {

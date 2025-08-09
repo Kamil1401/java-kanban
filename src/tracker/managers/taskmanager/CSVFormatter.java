@@ -60,14 +60,15 @@ public class CSVFormatter {
         }
     }
 
-    public static void historyToString(List<Task> history) {
+    public static String historyToString(List<Task> history) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < history.size(); i++) {
-            if (i == history.size() - 1) {
-                stringBuilder.append(history.get(i).getId());
+            stringBuilder.append(history.get(i).getId());
+            if (i < history.size() - 1) {
+                stringBuilder.append(",");
             }
-            System.out.println(stringBuilder.append(history.get(i).getId()).append(","));
         }
+        return stringBuilder.toString();
     }
 
     public static List<Integer> historyFromString(String str) {

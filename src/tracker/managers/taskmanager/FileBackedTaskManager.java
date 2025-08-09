@@ -7,18 +7,23 @@ import tracker.model.Task;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
 
-    public FileBackedTaskManager(File file) {
+    private FileBackedTaskManager(File file) {
         this.file = file;
     }
 
 
-    public void save() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+    public static FileBackedTaskManager getNewFailBackedTaskManager(File file) {
+        return new FileBackedTaskManager(file);
+    }
+
+    private void save() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write(CSVFormatter.getHeader());
 
             for (Task task : getTasks()) {
@@ -35,7 +40,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
             writer.newLine();
 
-            CSVFormatter.historyToString(historyManager.getHistory());
+            writer.write(CSVFormatter.historyToString(historyManager.getHistory()));
             writer.newLine();
         } catch (IOException e) {
             throw new ManagerSaveException("Произошла ошибка при попытке сохранения.");
@@ -44,31 +49,29 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
-        StringBuilder stringBuilder = new StringBuilder();
+        List<String> storage = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             while (reader.ready()) {
-                stringBuilder.append(reader.readLine()).append(System.lineSeparator());
+                String line = reader.readLine();
+                storage.add(line);
             }
-            String result = stringBuilder.toString();
-            String[] storage = result.split(System.lineSeparator());
 
             int i = 1;
-            while (i < storage.length && !storage[i].isBlank()) {
-                Task task = CSVFormatter.fromString(storage[i]);
+            while (i < storage.size() && !storage.get(i).isBlank()) {
+                Task task = CSVFormatter.fromString(storage.get(i));
 
                 switch (task.getType()) {
                     case TASK:
-                        fileBackedTaskManager.addTask(task);
+                        fileBackedTaskManager.tasks.put(task.getId(), task);
                         break;
                     case EPIC:
                         Epic epic = (Epic) task;
-                        fileBackedTaskManager.addEpic(epic);
+                        fileBackedTaskManager.epics.put(epic.getId(), epic);
                         break;
                     case SUBTASK:
-                        assert task instanceof Subtask;
                         Subtask subtask = (Subtask) task;
-                        fileBackedTaskManager.addSubtask(subtask);
+                        fileBackedTaskManager.subtasks.put(subtask.getId(), subtask);
                         if (fileBackedTaskManager.epics.containsKey(subtask.getEpicId())) {
                             Epic epicOfSubtask = fileBackedTaskManager.epics.get(subtask.getEpicId());
                             epicOfSubtask.addSubtaskId(subtask.getId());
@@ -81,8 +84,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 i++;
             }
 
-            if (i + 1 < storage.length) {
-                List<Integer> history = CSVFormatter.historyFromString(storage[i + 1]);
+            if (i + 1 < storage.size()) {
+                List<Integer> history = CSVFormatter.historyFromString(storage.get(i + 1));
                 for (Integer id : history) {
                     if (fileBackedTaskManager.tasks.containsKey(id)) {
                         fileBackedTaskManager.historyManager.add(fileBackedTaskManager.tasks.get(id));
