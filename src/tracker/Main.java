@@ -1,43 +1,36 @@
 package tracker;
 
 import tracker.managers.Managers;
-import tracker.managers.historymanager.InMemoryHistoryManager;
+import tracker.managers.taskmanager.FileBackedTaskManager;
 import tracker.managers.taskmanager.TaskManager;
 import tracker.model.Epic;
 import tracker.model.Subtask;
 import tracker.model.Task;
 
+import java.io.File;
+
 public class Main {
     public static void main(String[] args) {
-        TaskManager taskManager = Managers.getDefault();
-        Task dinner = new Task("Ужин", "Приготовить ужин");
-        taskManager.addTask(dinner);
-        System.out.println(dinner.getId());
-        Epic repair = new Epic("Ремонт", "Начать ремонт в квартире");
-        taskManager.addEpic(repair);
-        Subtask hiring = new Subtask("Нанять бригаду", "Позвонить мастерам", repair.getId());
-        Subtask materials = new Subtask("Съездить в Добрострой", "Купить материалы", repair.getId());
-        taskManager.addSubtask(hiring);
-        taskManager.addSubtask(materials);
-        Epic sale = new Epic("Продажа", "Продать машины");
-        taskManager.addEpic(sale);
-        Subtask advertisement = new Subtask("Реклама", "Разместить на авито", sale.getId());
-        Subtask service = new Subtask("Сервис", "Отвезти машину в сервис", sale.getId());
-        taskManager.addSubtask(advertisement);
-        taskManager.addSubtask(service);
+        TaskManager manager = Managers.getDefault();
+        File file = new File("C:\\Users\\User\\IdeaProjects\\Final_Work_6\\java-kanban","Work.csv");
 
-        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
-        taskManager.getTask(dinner.getId());
-        dinner.setId(4125748);
-        taskManager.getEpic(repair.getId());
-        repair.setId(94715);
-        taskManager.getSubtask(hiring.getId());
-        hiring.setId(64758);
-        System.out.println(taskManager.getHistory());
+        Task task1 = new Task("Task1", "Task1");
+        Task task2 = new Task("Task2", "Task2");
+        Task task3 = new Task("Task3", "Task3");
+        manager.addTask(task1);
+        manager.addTask(task2);
+        manager.addTask(task3);
 
-        Epic epicCopy = sale.copy();
-        for (Integer sI : epicCopy.getSubtaskIds()) {
-            System.out.println(taskManager.getSubtask(sI));
-        }
+        Epic epic1 = new Epic("Epic1", "Epic1");
+        manager.addEpic(epic1);
+        Subtask subtask1 = new Subtask("Subtask1", "Subtask1", epic1.getId());
+        manager.addSubtask(subtask1);
+
+        manager.getTask(task1.getId());
+        manager.getEpic(epic1.getId());
+        manager.getSubtask(subtask1.getId());
+
+        TaskManager manager1 = FileBackedTaskManager.loadFromFile(file);
+        System.out.println(manager1.getHistory());
     }
 }

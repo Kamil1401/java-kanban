@@ -7,12 +7,14 @@ public class Task {
     private String description;
     private Integer id;
     private Status status;
+    protected TaskType type;
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.id = 0;
         this.status = Status.NEW;
+        this.type = TaskType.TASK;
     }
 
     public String getName() {
@@ -31,7 +33,7 @@ public class Task {
         this.id = id;
     }
 
-    public void clearId() {
+    public void deleteId() {
         this.id = null;
     }
 
@@ -49,6 +51,10 @@ public class Task {
         taskCopy.setStatus(this.status);
 
         return taskCopy;
+    }
+
+    public TaskType getType() {
+        return this.type;
     }
 
     @Override

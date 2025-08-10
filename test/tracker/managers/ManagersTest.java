@@ -4,16 +4,23 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tracker.managers.historymanager.HistoryManager;
 import tracker.managers.historymanager.InMemoryHistoryManager;
-import tracker.managers.taskmanager.InMemoryTaskManager;
+import tracker.managers.taskmanager.FileBackedTaskManager;
 import tracker.managers.taskmanager.TaskManager;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 class ManagersTest {
 
     @Test
-    public void getDefault_returnsTrue_getInstanceOfInMemoryTaskManager() {
+    public void getDefault_returnsTrue_getInstanceOfInMemoryTaskManager() throws IOException {
+        File file = Files.createTempFile("Test1", ".csv").toFile();
         TaskManager taskManager = Managers.getDefault();
-        Assertions.assertInstanceOf(InMemoryTaskManager.class, taskManager);
+
         Assertions.assertNotNull(taskManager);
+        Assertions.assertInstanceOf(taskManager.getClass(),
+                FileBackedTaskManager.getNewFailBackedTaskManager(file));
     }
 
     @Test
