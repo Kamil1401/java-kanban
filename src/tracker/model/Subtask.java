@@ -1,10 +1,13 @@
 package tracker.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     private final Integer epicId;
 
-    public Subtask(String name, String description, Integer epicId) {
-        super(name, description);
+    public Subtask(String name, String description, Integer epicId, LocalDateTime startTime, Duration duration) {
+        super(name, description, startTime, duration);
         this.epicId = epicId;
         this.type = TaskType.SUBTASK;
     }
@@ -23,7 +26,8 @@ public class Subtask extends Task {
     }
 
     public Subtask copy() {
-        Subtask subtaskCopy = new Subtask(this.getName(), this.getDescription(), this.epicId);
+        Subtask subtaskCopy = new Subtask(this.getName(), this.getDescription(), this.epicId,
+                this.getStartTime(), this.getDuration());
         subtaskCopy.setId(this.getId());
         subtaskCopy.setStatus(this.getStatus());
 

@@ -1,15 +1,20 @@
 package tracker.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+
 
 public class Epic extends Task {
     private ArrayList<Integer> subtaskIds;
+    LocalDateTime endTime;
 
     public Epic(String name, String description) {
-        super(name, description);
+        super(name, description, null, Duration.ofMinutes(0));
         subtaskIds = new ArrayList<>();
         this.type = TaskType.EPIC;
     }
+
 
     public void addSubtaskId(Integer subtaskId) {
         if (subtaskId.equals(this.getId())) {
@@ -28,7 +33,18 @@ public class Epic extends Task {
         epicCopy.setId(this.getId());
         epicCopy.setStatus(this.getStatus());
         epicCopy.subtaskIds = new ArrayList<>(subtaskIds);
+        epicCopy.setStartTime(this.getStartTime());
+        epicCopy.setDuration(this.getDuration());
 
         return epicCopy;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 }
