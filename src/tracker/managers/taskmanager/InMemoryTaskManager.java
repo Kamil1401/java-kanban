@@ -5,7 +5,6 @@ import tracker.managers.historymanager.HistoryManager;
 import tracker.model.*;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -31,14 +30,16 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    @Override
-    public List<Task> getPrioritizedTasks() {
+    private List<Task> getPrioritizedTasks() {
         return new ArrayList<>(prioritizedTasks);
     }
 
-    @Override
-    public <T extends Task> void addToSetOfPrioritizedTasks(T task) {
-        if (task.getStartTime() == null && hasOverlap(task)) {
+    protected <T extends Task> void addToSetOfPrioritizedTasks(T task) {
+        if (task.getStartTime() == null) {
+            throw new IllegalArgumentException("Приоритет выставляется по времени старта задачи. " +
+                    "Он не может являться пустым значением.");
+        }
+        if (hasOverlap(task)) {
             return;
         }
         if (prioritizedTasks.contains(task)) {
@@ -47,8 +48,11 @@ public class InMemoryTaskManager implements TaskManager {
         prioritizedTasks.add(task);
     }
 
-    @Override
-    public <T extends Task> boolean isOverlap(T task1, T task2) {
+    protected <T extends Task> boolean isOverlap(T task1, T task2) {
+        if (task1.getStartTime() == null || task2.getStartTime() == null
+                || task1.getDuration() == null || task2.getDuration() == null) {
+            throw new IllegalArgumentException("Значения полей 'startTime' и 'duration' не могут быть пустыми.");
+        }
         return task1.getStartTime().isBefore(task2.getEndTime())
                 && task2.getStartTime().isBefore(task1.getEndTime());
     }
@@ -73,19 +77,40 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(Integer id) {
-        historyManager.add(tasks.get(id));
+        Task task = tasks.get(id);
+        if (task != null) {
+            historyManager.add(tasks.get(id));
+        }
         return tasks.get(id);
     }
 
     @Override
     public void addTask(Task task) {
+        if (task == null) {
+            throw new IllegalArgumentException("Нельзя добавить задачу со значением null");
+        }
+        if (task.getStartTime() == null || task.getDuration() == null) {
+            throw new IllegalArgumentException("Значения полей 'startTime' и 'duration' не могут быть пустыми");
+        }
         task.setId(generateId());
+        if (hasOverlap(task)) {
+            return;
+        }
         tasks.put(task.getId(), task);
         addToSetOfPrioritizedTasks(task);
     }
 
     @Override
     public Task updateTask(Task task) {
+        if (task == null) {
+            throw new IllegalArgumentException("Нельзя заменить на задачу со значением null");
+        }
+        if (task.getStartTime() == null || task.getDuration() == null) {
+            throw new IllegalArgumentException("Значения полей 'startTime' и 'duration' не могут быть пустыми");
+        }
+        if (hasOverlap(task)) {
+            throw new IllegalArgumentException("Задача пересекается с другой задачей");
+        }
         prioritizedTasks.remove(task);
         tasks.put(task.getId(), task);
         addToSetOfPrioritizedTasks(task);
@@ -115,18 +140,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpic(Integer id) {
-        historyManager.add(epics.get(id));
+        Epic epic = epics.get(id);
+        if (epic != null) {
+            historyManager.add(epics.get(id));
+        }
         return epics.get(id);
     }
 
     @Override
     public void addEpic(Epic epic) {
+        if (epic == null) {
+            throw new IllegalArgumentException("Нельзя добавить задачу со значением null");
+        }
         epic.setId(generateId());
         epics.put(epic.getId(), epic);
     }
 
     @Override
     public Epic updateEpic(Epic epic) {
+        if (epic == null) {
+            throw new IllegalArgumentException("Нельзя заменить на задачу со значением null");
+        }
         prioritizedTasks.remove(epic);
         epics.put(epic.getId(), epic);
         updateEpicStatus(epic);
@@ -182,16 +216,28 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask getSubtask(Integer id) {
-        historyManager.add(subtasks.get(id));
+        Subtask subtask = subtasks.get(id);
+        if (subtask != null) {
+            historyManager.add(subtasks.get(id));
+        }
         return subtasks.get(id);
     }
 
     @Override
     public void addSubtask(Subtask subtask) {
+        if (subtask == null) {
+            throw new IllegalArgumentException("Нельзя добавить задачу со значением null");
+        }
+        if (subtask.getStartTime() == null || subtask.getDuration() == null) {
+            throw new IllegalArgumentException("Значения полей 'startTime' и 'duration' не могут быть пустыми");
+        }
         subtask.setId(generateId());
 
         Epic epicOfSubtask = epics.get(subtask.getEpicId());
         if (epicOfSubtask == null || !epics.containsKey(epicOfSubtask.getId())) {
+            return;
+        }
+        if (hasOverlap(subtask)) {
             return;
         }
         subtasks.put(subtask.getId(), subtask);
@@ -205,6 +251,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Subtask updateSubtask(Subtask subtask) {
+        if (subtask == null) {
+            throw new IllegalArgumentException("Нельзя заменить на задачу со значением null");
+        }
+        if (subtask.getStartTime() == null || subtask.getDuration() == null) {
+            throw new IllegalArgumentException("Значения полей 'startTime' и 'duration' не могут быть пустыми");
+        }
+        if (hasOverlap(subtask)) {
+            throw new IllegalArgumentException("Подзадача пересекается с другой задачей");
+        }
         prioritizedTasks.remove(subtask);
         Epic epicOfSubtask = epics.get(subtask.getEpicId());
         subtasks.put(subtask.getId(), subtask);
@@ -273,23 +328,20 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpicTime(Epic epic) {
         if (epic.getSubtaskIds().isEmpty()) {
             epic.setStartTime(null);
-            epic.setDuration(Duration.ofMinutes(0));
+            epic.setDuration(Duration.ZERO);
             epic.setEndTime(null);
             return;
         }
-        epic.setStartTime(LocalDateTime.MAX);
-        Duration durationOfEpic = null;
-        epic.setEndTime(LocalDateTime.MIN);
-        for (Integer id : epic.getSubtaskIds()) {
-            Subtask subtask = subtasks.get(id);
-            durationOfEpic = epic.getDuration().plus(subtask.getDuration());
-            if (subtask.getStartTime().isBefore(epic.getStartTime())) {
-                epic.setStartTime(subtask.getStartTime());
-            }
-            if (subtask.getEndTime().isAfter(epic.getEndTime())) {
-                epic.setEndTime(subtask.getEndTime());
-            }
-        }
-        epic.setDuration(durationOfEpic);
+        List<Subtask> listOfSubtasks = getSubtasksForEpic(epic);
+        listOfSubtasks.stream()
+                .sorted(new TaskComparator())
+                .forEach(subtask -> {
+                    if (subtask.getStartTime() == null || subtask.getDuration() == null) {
+                        throw new IllegalArgumentException(
+                                "Значения полей 'startTime' и 'duration' не могут быть пустыми");
+                    }
+                    epic.setDuration(epic.getDuration().plus(subtask.getDuration()));
+                });
+        epic.setStartTime(listOfSubtasks.getFirst().getStartTime());
     }
 }

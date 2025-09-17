@@ -7,10 +7,10 @@ import java.util.ArrayList;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtaskIds;
-    LocalDateTime endTime;
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
-        super(name, description, null, Duration.ofMinutes(0));
+        super(name, description, null, Duration.ZERO);
         subtaskIds = new ArrayList<>();
         this.type = TaskType.EPIC;
     }
@@ -41,6 +41,10 @@ public class Epic extends Task {
 
     @Override
     public LocalDateTime getEndTime() {
+        if (getStartTime() == null) {
+            return null;
+        }
+        this.endTime = this.getStartTime().plus(this.getDuration());
         return endTime;
     }
 

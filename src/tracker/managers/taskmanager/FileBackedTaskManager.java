@@ -65,6 +65,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 switch (task.getType()) {
                     case TASK:
                         fileBackedTaskManager.tasks.put(task.getId(), task);
+                        fileBackedTaskManager.addToSetOfPrioritizedTasks(task);
                         break;
                     case EPIC:
                         Epic epic = (Epic) task;
@@ -73,11 +74,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     case SUBTASK:
                         Subtask subtask = (Subtask) task;
                         fileBackedTaskManager.subtasks.put(subtask.getId(), subtask);
+                        fileBackedTaskManager.addToSetOfPrioritizedTasks(subtask);
                         if (fileBackedTaskManager.epics.containsKey(subtask.getEpicId())) {
                             Epic epicOfSubtask = fileBackedTaskManager.epics.get(subtask.getEpicId());
                             epicOfSubtask.addSubtaskId(subtask.getId());
                             fileBackedTaskManager.updateEpicStatus(epicOfSubtask);
                             fileBackedTaskManager.updateEpicTime(epicOfSubtask);
+                            fileBackedTaskManager.addToSetOfPrioritizedTasks(epicOfSubtask);
                         }
                         break;
                 }
@@ -198,18 +201,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public void removeSubtask(Integer id) {
         super.removeSubtask(id);
-        save();
-    }
-
-    @Override
-    public void updateEpicStatus(Epic epic) {
-        super.updateEpicStatus(epic);
-        save();
-    }
-
-    @Override
-    public void updateEpicTime(Epic epic) {
-        super.updateEpicTime(epic);
         save();
     }
 }

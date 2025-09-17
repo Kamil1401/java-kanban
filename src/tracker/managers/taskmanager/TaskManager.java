@@ -11,12 +11,6 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-    List<Task> getPrioritizedTasks();
-
-    <T extends Task> void addToSetOfPrioritizedTasks(T task);
-
-    <T extends Task> boolean isOverlap(T task1, T task2);
-
 
     // TASK METHODS
     ArrayList<Task> getTasks();
