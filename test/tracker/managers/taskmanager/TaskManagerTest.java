@@ -27,6 +27,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task task = new Task("Отдых", "Посмотреть сериал вечером",
                 LocalDateTime.of(1958, 8, 29, 20, 0), Duration.ofMinutes(420));
         taskManager.addTask(task);
+        taskManager.updateTask(task);
 
         Assertions.assertTrue(taskManager.getTasks().contains(task));
     }
@@ -90,7 +91,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         task_1.setId(1);
         taskManager.addTask(task_1);
         Task task_2 = new Task("Стихотворение", "Сочинить",
-                LocalDateTime.of(1958, 8, 29, 14, 0), Duration.ofMinutes(90));
+                LocalDateTime.of(1958, 8, 29, 15, 45), Duration.ofMinutes(90));
         taskManager.addTask(task_2);
 
         Assertions.assertNotEquals(task_1.getId(), task_2.getId());

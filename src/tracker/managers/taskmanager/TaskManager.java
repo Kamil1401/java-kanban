@@ -11,6 +11,8 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
+    List<Task> getPrioritizedTasks();
+
 
     // TASK METHODS
     ArrayList<Task> getTasks();
