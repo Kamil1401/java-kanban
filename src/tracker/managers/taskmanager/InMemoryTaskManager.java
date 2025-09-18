@@ -41,6 +41,9 @@ public class InMemoryTaskManager implements TaskManager {
                 || task1.getDuration() == null || task2.getDuration() == null) {
             return false;
         }
+        if (task1.getId().equals(task2.getId())) {
+            return false;
+        }
         return task1.getStartTime().isBefore(task2.getEndTime())
                 && task2.getStartTime().isBefore(task1.getEndTime());
     }
@@ -92,8 +95,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null) {
             throw new IllegalArgumentException("Нельзя заменить на задачу со значением null");
         }
-        prioritizedTasks.remove(task);
         hasOverlap(task);
+        prioritizedTasks.remove(task);
         tasks.put(task.getId(), task);
         if (task.getStartTime() != null) {
             prioritizedTasks.add(task);
@@ -118,7 +121,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void clearEpics() {
         prioritizedTasks.removeAll(subtasks.values());
-        prioritizedTasks.removeAll(epics.values());
         getEpics().forEach(epic -> epic.getSubtaskIds().clear());
         subtasks.clear();
         epics.clear();
@@ -139,11 +141,7 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Нельзя добавить задачу со значением null");
         }
         epic.setId(generateId());
-        hasOverlap(epic);
         epics.put(epic.getId(), epic);
-        if (epic.getStartTime() != null) {
-            prioritizedTasks.add(epic);
-        }
     }
 
     @Override
@@ -151,12 +149,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             throw new IllegalArgumentException("Нельзя заменить на задачу со значением null");
         }
-        prioritizedTasks.remove(epic);
         epics.put(epic.getId(), epic);
         updateStatusAndTimeOfEpic(epic);
-        if (epic.getStartTime() != null) {
-            prioritizedTasks.add(epic);
-        }
         return epic;
     }
 
@@ -174,7 +168,6 @@ public class InMemoryTaskManager implements TaskManager {
         });
         epic.getSubtaskIds().clear();
         historyManager.remove(epic.getId());
-        prioritizedTasks.remove(epic);
         epics.remove(id);
     }
 
@@ -186,7 +179,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearSubtasks() {
-        prioritizedTasks.removeAll(epics.values());
         prioritizedTasks.removeAll(subtasks.values());
         subtasks.clear();
         epics.values().forEach(epic -> {
@@ -210,7 +202,6 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Нельзя добавить задачу со значением null");
         }
         subtask.setId(generateId());
-
         Epic epicOfSubtask = epics.get(subtask.getEpicId());
         if (epicOfSubtask == null || !epics.containsKey(epicOfSubtask.getId())) {
             return;
@@ -222,9 +213,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
         epicOfSubtask.addSubtaskId(subtask.getId());
         updateStatusAndTimeOfEpic(epicOfSubtask);
-        if (epicOfSubtask.getStartTime() != null) {
-            prioritizedTasks.add(epicOfSubtask);
-        }
     }
 
     @Override
@@ -252,9 +240,6 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.remove(id);
         subtask.deleteId();
         updateStatusAndTimeOfEpic(epicOfSubtask);
-        if (epicOfSubtask.getStartTime() == null) {
-            prioritizedTasks.remove(epicOfSubtask);
-        }
     }
 
 

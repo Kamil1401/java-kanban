@@ -74,7 +74,7 @@ public class Task {
 
     public LocalDateTime getEndTime() {
         if (this.startTime == null || this.duration == null) {
-            throw new IllegalArgumentException("Значения полей 'startTime' и 'duration' не могут быть пустыми");
+            return null;
         }
          return this.startTime.plus(this.duration);
     }
