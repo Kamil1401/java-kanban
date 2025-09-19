@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
 
@@ -64,6 +65,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 switch (task.getType()) {
                     case TASK:
                         fileBackedTaskManager.tasks.put(task.getId(), task);
+                        fileBackedTaskManager.prioritizedTasks.add(task);
                         break;
                     case EPIC:
                         Epic epic = (Epic) task;
@@ -72,9 +74,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     case SUBTASK:
                         Subtask subtask = (Subtask) task;
                         fileBackedTaskManager.subtasks.put(subtask.getId(), subtask);
+                        fileBackedTaskManager.prioritizedTasks.add(subtask);
                         if (fileBackedTaskManager.epics.containsKey(subtask.getEpicId())) {
                             Epic epicOfSubtask = fileBackedTaskManager.epics.get(subtask.getEpicId());
                             epicOfSubtask.addSubtaskId(subtask.getId());
+                            fileBackedTaskManager.updateStatusAndTimeOfEpic(epicOfSubtask);
                         }
                         break;
                 }
@@ -97,7 +101,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerSaveException("Эх");
+            throw new ManagerSaveException("Ошибка при попытке восстановления данных.");
         }
         return fileBackedTaskManager;
     }

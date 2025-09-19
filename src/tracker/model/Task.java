@@ -1,20 +1,27 @@
 package tracker.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
     private Integer id;
     private Status status;
     protected TaskType type;
+    private LocalDateTime startTime;
+    private Duration duration;
 
-    public Task(String name, String description) {
+
+    public Task(String name, String description, LocalDateTime startTime, Duration duration) {
         this.name = name;
         this.description = description;
         this.id = 0;
         this.status = Status.NEW;
         this.type = TaskType.TASK;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public String getName() {
@@ -45,16 +52,40 @@ public class Task {
         this.status = status;
     }
 
+    public TaskType getType() {
+        return this.type;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (this.startTime == null || this.duration == null) {
+            return null;
+        }
+         return this.startTime.plus(this.duration);
+    }
+
     public Task copy() {
-        Task taskCopy = new Task(this.name, this.description);
+        Task taskCopy = new Task(this.name, this.description, this.startTime, this.duration);
         taskCopy.setId(this.id);
         taskCopy.setStatus(this.status);
 
-        return taskCopy;
-    }
 
-    public TaskType getType() {
-        return this.type;
+        return taskCopy;
     }
 
     @Override
@@ -78,6 +109,7 @@ public class Task {
                 ", description = '" + description + '\'' +
                 ", id = " + id +
                 ", status = " + status +
+                ", type = " + type +
                 '}';
     }
 }
