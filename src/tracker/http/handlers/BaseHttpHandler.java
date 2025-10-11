@@ -31,12 +31,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        try {
-            handleRequest(exchange);
-        }
-        catch (Exception e) {
-            sendText(exchange, "Внутренняя ошибка сервера", 500);
-        }
+        handleRequest(exchange);
     }
 
     abstract void handleRequest(HttpExchange exchange) throws IOException;
