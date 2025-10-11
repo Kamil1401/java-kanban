@@ -5,13 +5,13 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
-    private final String name;
-    private final String description;
-    private Integer id;
-    private Status status;
+    protected String name;
+    protected String description;
+    protected Integer id;
+    protected Status status;
     protected TaskType type;
-    private LocalDateTime startTime;
-    private Duration duration;
+    protected LocalDateTime startTime;
+    protected Duration duration;
 
 
     public Task(String name, String description, LocalDateTime startTime, Duration duration) {
@@ -104,12 +104,14 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task {" +
-                "name = '" + name + '\'' +
-                ", description = '" + description + '\'' +
-                ", id = " + id +
-                ", status = " + status +
-                ", type = " + type +
+        return "Task{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
+                ", status=" + status +
+                ", type=" + type +
+                ", startTime=" + startTime +
+                ", duration=" + duration +
                 '}';
     }
 }

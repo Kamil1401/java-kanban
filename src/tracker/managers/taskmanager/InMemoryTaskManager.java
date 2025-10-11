@@ -37,11 +37,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected <T extends Task> boolean hasOverlap(T task1, T task2) {
-        if (task1.getStartTime() == null || task2.getStartTime() == null
-                || task1.getDuration() == null || task2.getDuration() == null) {
+        if (task1.getId().equals(task2.getId())) {
             return false;
         }
-        if (task1.getId().equals(task2.getId())) {
+        if (task1.getStartTime() == null || task2.getStartTime() == null
+                || task1.getDuration() == null || task2.getDuration() == null) {
             return false;
         }
         return task1.getStartTime().isBefore(task2.getEndTime())
@@ -211,6 +211,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtask.getStartTime() != null) {
             prioritizedTasks.add(subtask);
         }
+
         epicOfSubtask.addSubtaskId(subtask.getId());
         updateStatusAndTimeOfEpic(epicOfSubtask);
     }
