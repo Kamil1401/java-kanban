@@ -6,7 +6,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tracker.http.handlers.SubtaskHandler;
 import tracker.http.handlers.adapters.DurationAdapter;
 import tracker.http.handlers.adapters.LocalDateTimeAdapter;
 import tracker.http.httpserver.HttpTaskServer;
