@@ -1,11 +1,14 @@
 package tracker.http;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tracker.http.handlers.SubtaskHandler;
+import tracker.http.handlers.adapters.DurationAdapter;
+import tracker.http.handlers.adapters.LocalDateTimeAdapter;
 import tracker.http.httpserver.HttpTaskServer;
 import tracker.managers.taskmanager.InMemoryTaskManager;
 import tracker.managers.taskmanager.TaskManager;
@@ -24,7 +27,12 @@ import java.util.List;
 public class HttpTaskManagerSubtasksTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
-    Gson gson = SubtaskHandler.getGson();
+    Gson gson = new GsonBuilder()
+            .serializeNulls()
+            .setPrettyPrinting()
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+            .registerTypeAdapter(Duration.class, new DurationAdapter())
+            .create();
 
     public HttpTaskManagerSubtasksTest() {
     }

@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public abstract class BaseHttpHandler implements HttpHandler {
     protected TaskManager taskManager;
-    protected static Gson gson = new GsonBuilder()
+    protected Gson gson = new GsonBuilder()
             .serializeNulls()
             .setPrettyPrinting()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
@@ -35,10 +35,6 @@ public abstract class BaseHttpHandler implements HttpHandler {
     }
 
     abstract void handleRequest(HttpExchange exchange) throws IOException;
-
-    public static Gson getGson() {
-        return gson;
-    }
 
     protected void sendText(HttpExchange exchange, String text, int statusCode) throws IOException {
         byte[] response = text.getBytes(StandardCharsets.UTF_8);
